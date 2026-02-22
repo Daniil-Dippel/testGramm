@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>NeDoGramm</title>
+    <style>
+ :root {
+    --bg: #0b141a;
+    --bg2: #0f1c24;
+    --panel: #111b22;
+    --accent: #10a37f;
+    --accent2: #19c37d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --incoming: #18222b;
+    --outgoing: #0f3d33;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden; /* фикс бага со скроллом страницы */
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+    background: radial-gradient(circle at 20% 10%, #0f2027, #0b141a 60%);
+    color: var(--text);
+}
+
+/* ===== DESKTOP LAYOUT FIX ===== */
+
+.wrap {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.card {
+    width: 100%;
+    max-width: 1200px;
+    height: 85vh;
+    min-height: 650px;
+    background: linear-gradient(180deg, var(--bg2), var(--bg));
+    border-radius: 20px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, .6);
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .04);
+}
+
+.sidebar {
+    padding: 30px;
+    background: linear-gradient(180deg, #0f1c24, #0c171d);
+    border-right: 1px solid rgba(255, 255, 255, .05);
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 30px;
+}
+
+.mark {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: #022;
+}
+
+h1 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.sub {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.account input {
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    background: #0e171d;
+    border: 1px solid rgba(255, 255, 255, .05);
+    color: var(--text);
+    outline: none;
+}
+
+.account input:focus {
+    border-color: var(--accent);
+}
+
+.btn {
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    font-weight: 700;
+    color: #022;
+    cursor: pointer;
+    width: 100%;
+}
+
+.logout {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 12px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, .08);
+    color: var(--muted);
+    cursor: pointer;
+}
+
+/* ===== CHAT FIX ===== */
+
+.chat {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden; /* фикс бага */
+}
+
+.chat-header {
+    padding: 25px 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, .05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.room {
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.chat-body {
+    flex: 1;
+    overflow-y: auto; /* теперь скролл только тут */
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.messages {
+    width: 100%;
+    max-width: 850px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.msg {
+    padding: 14px 18px;
+    border-radius: 16px;
+    background: var(--incoming);
+    max-width: 70%;
+}
+
+.msg.out {
+    margin-left: auto;
+    background: linear-gradient(180deg, var(--outgoing), #0c4b3e);
+    border: 1px solid rgba(255, 255, 255, .05);
+}
+
+.msg .meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+/* ===== FIXED COMPOSER ===== */
+
+.composer {
+    flex-shrink: 0;
+    padding: 20px 30px;
+    border-top: 1px solid rgba(255, 255, 255, .05);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: linear-gradient(180deg, #0b141a, #0f1c24);
+}
+
+textarea {
+    flex: 1;
+    min-height: 48px;
+    max-height: 120px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: #0e171d;
+    border: 1px solid rgba(255, 255, 255, .05);
+    color: var(--text);
+    resize: none;
+    outline: none;
+}
+
+textarea:focus {
+    border-color: var(--accent);
+}
+
+.send {
+    padding: 12px 20px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    font-weight: 700;
+    color: #022;
+    cursor: pointer;
+}
+
+/* скрываем мобильные элементы на ПК */
+#mobileSidebar,
+#emojiSheet,
+.hamburger,
+.emoji-fab {
+    display: none;
+}
+
+/* ===== MOBILE ===== */
+
+@media(max-width:900px) {
+
+    html, body {
+        overflow: auto;
+    }
+
+    .wrap {
+        padding: 0;
+        height: 100vh;
+    }
+
+    .card {
+        height: 100vh;
+        border-radius: 0;
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        display: none;
+    }
+
+    .chat-body {
+        padding: 14px;
+    }
+
+    .msg {
+        max-width: 85%;
+    }
+
+    .composer {
+        position: sticky;
+        bottom: 0;
+    }
+
+    #mobileSidebar,
+    #emojiSheet,
+    .hamburger,
+    .emoji-fab {
+        display: flex;
+    }
+}
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="card">
+            <aside class="sidebar">
+                <div class="logo">
+                    <div class="mark">ND</div>
+                    <div>
+                        <h1>NeDoGramm</h1>
+                        <div class="sub">Только текст и эмодзи</div>
+                    </div>
+                </div>
+                <div id="fullSidebarContent">
+                    <div class="account" id="accountLarge">
+                        <input id="nameInput" placeholder="Ваш ник" maxlength="20" />
+                        <input id="pinInput" placeholder="4-значный PIN" maxlength="4" />
+                        <button class="btn" id="loginBtn">Войти</button>
+                        <button class="logout" id="logoutBtn">Выйти</button>
+                    </div>
+                </div>
+            </aside>
+            <section class="chat">
+                <div class="chat-header">
+                    <div style="position:relative;width:100%">
+                        <div class="hamburger" id="hamburger" title="Меню" style="display:none">☰</div>
+                        <div class="room">💬 Ваш приватный канал</div>
+                    </div>
+                </div>
+                <div class="chat-body">
+                    <div class="messages" id="messages"></div>
+                </div>
+                <div class="composer">
+                    <button class="emoji-fab" id="emojiFab" title="Эмодзи" style="display:none">😊</button>
+                    <textarea id="textInput" placeholder="Сообщение..."></textarea>
+                    <button class="send" id="sendBtn">Отправить</button>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- mobile sidebar (for login) -->
+    <div id="mobileSidebar" aria-hidden="true">
+        <button class="close" id="mobileClose">✕</button>
+        <div style="margin-top:28px">
+            <h2 style="margin:0 0 8px 0">Вход</h2>
+            <div class="account">
+                <input id="mName" placeholder="Ваш ник" maxlength="20" />
+                <input id="mPin" placeholder="4-значный PIN" maxlength="4" />
+                <button class="btn" id="mLogin">Войти</button>
+            </div>
+            <div style="margin-top:18px">
+                <button class="btn" id="mLogout">Выйти</button>
+            </div>
+        </div>
+    </div>
+    <!-- emoji sheet -->
+    <div id="emojiSheet" aria-hidden="true">
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <div class="emoji">😀</div>
+            <div class="emoji">😂</div>
+            <div class="emoji">😍</div>
+            <div class="emoji">😎</div>
+            <div class="emoji">🔥</div>
+            <div class="emoji">👍</div>
+            <div class="emoji">🤖</div>
+            <div class="emoji">😢</div>
+            <div class="emoji">👏</div>
+            <div class="emoji">🙌</div>
+        </div>
+    </div>
+    <script>
+        const BASE = 'https://65be4318dcfcce42a6f21e41.mockapi.io/neDoGramm';
+        const storageKey = 'nedogram-user';
+        let user = null;
+        function $(id) { return document.getElementById(id) }
+        const messagesEl = $('messages');
+        function loadUser() {
+            const raw = localStorage.getItem(storageKey);
+            if (raw) user = JSON.parse(raw);
+            // populate mobile inputs too
+            if (user) { $('mName').value = user.name; $('mPin').value = user.pin; $('nameInput') && ($('nameInput').value = user.name); $('pinInput') && ($('pinInput').value = user.pin) }
+            updateLoginUI();
+        }
+        function saveUser() { localStorage.setItem(storageKey, JSON.stringify(user)); updateLoginUI(); }
+        function updateLoginUI() {
+            const logged = !!user;
+            if (window.innerWidth > 900) {
+                // desktop: keep sidebar
+                $('loginBtn').textContent = logged ? 'Сменить' : 'Войти';
+                $('logoutBtn').style.display = logged ? 'inline-block' : 'none';
+            }
+        }
+        // desktop login
+        $('loginBtn')?.addEventListener('click', () => {
+            const name = $('nameInput').value.trim(); const pin = $('pinInput').value.trim();
+            if (!/^\d{4}$/.test(pin)) return alert('PIN должен быть 4 цифры'); user = { name: name || 'User', pin }; saveUser();
+        });
+        $('logoutBtn')?.addEventListener('click', () => { localStorage.removeItem(storageKey); user = null; updateLoginUI(); });
+        // mobile hamburger
+        const hamburger = $('hamburger'), mobileSidebar = $('mobileSidebar'), mobileClose = $('mobileClose');
+        function showMobileSidebar(open) { if (open) { mobileSidebar.classList.add('open'); mobileSidebar.setAttribute('aria-hidden', 'false'); } else { mobileSidebar.classList.remove('open'); mobileSidebar.setAttribute('aria-hidden', 'true'); } }
+        hamburger.addEventListener('click', () => showMobileSidebar(true));
+        mobileClose.addEventListener('click', () => showMobileSidebar(false));
+        // mobile login inside sidebar
+        $('mLogin').addEventListener('click', () => { const name = $('mName').value.trim(); const pin = $('mPin').value.trim(); if (!/^\d{4}$/.test(pin)) return alert('PIN должен быть 4 цифры'); user = { name: name || 'User', pin }; saveUser(); showMobileSidebar(false); });
+        $('mLogout').addEventListener('click', () => { localStorage.removeItem(storageKey); user = null; showMobileSidebar(false); updateLoginUI(); });
+        // emoji handling
+        function insertAtCursor(field, value) { const start = field.selectionStart || 0; const end = field.selectionEnd || 0; field.value = field.value.slice(0, start) + value + field.value.slice(end); field.selectionStart = field.selectionEnd = start + value.length; }
+        // inline emoji picker (desktop)
+        document.addEventListener('click', (e) => {
+            if (e.target.classList && e.target.classList.contains('emoji')) {
+                if (window.innerWidth <= 900) { // mobile sheet
+                    insertAtCursor($('textInput'), e.target.textContent); $('emojiSheet').classList.remove('open');
+                } else {
+                    insertAtCursor($('textInput'), e.target.textContent);
+                }
+            }
+        });
+        // emoji FAB toggle
+        $('emojiFab').addEventListener('click', () => { const sheet = $('emojiSheet'); sheet.classList.toggle('open'); });
+        // send message
+        $('sendBtn').addEventListener('click', send);
+        $('textInput').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+        async function fetchMessages() { try { const r = await fetch(BASE); const d = await r.json(); d.sort((a, b) => new Date(a.ts) - new Date(b.ts)); render(d); } catch (e) { console.warn('fetch err', e); } }
+        function render(data) { messagesEl.innerHTML = ''; data.forEach(m => { const div = document.createElement('div'); div.className = 'msg'; if (user && m.pin === user.pin) div.classList.add('out'); div.innerHTML = `<div class="meta">${escapeHtml(m.name)} • ${new Date(m.ts).toLocaleString()}</div><div>${escapeHtml(m.text)}</div>`; messagesEl.appendChild(div); }); messagesEl.scrollTop = messagesEl.scrollHeight; }
+        function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>"']/g, function (m) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": "&#39;" }[m]; }); }
+        async function send() {
+            if (!user) return alert('Сначала войдите (через меню)'); const txt = $('textInput').value.trim(); if (!txt) return; const payload = { name: user.name, pin: user.pin, text: txt, ts: new Date().toISOString() }; // optimistic add
+            $('textInput').value = ''; try { await fetch(BASE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); await fetchMessages(); } catch (e) { console.warn('send err', e); }
+        }
+        // responsive tweaks
+        function onResize() {
+            if (window.innerWidth <= 900) {
+                $('hamburger').style.display = 'flex'; $('emojiFab').style.display = 'flex'; $('emojiSheet').style.display = 'block'; // move login inputs to mobile sidebar
+                // fill mobile inputs from desktop if present
+                $('mName').value = $('nameInput')?.value || $('mName').value || '';
+                $('mPin').value = $('pinInput')?.value || $('mPin').value || '';
+            } else { $('hamburger').style.display = 'none'; $('emojiFab').style.display = 'none'; $('emojiSheet').classList.remove('open'); showMobileSidebar(false); }
+        }
+        window.addEventListener('resize', onResize);
+        // initial
+        loadUser(); fetchMessages(); setInterval(fetchMessages, 2500); onResize();
+    </script>
+</body>
+
+</html>
